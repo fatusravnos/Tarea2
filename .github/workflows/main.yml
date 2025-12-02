@@ -24,7 +24,7 @@ jobs:
       run: find . -name "*.class" -type f -delete
       
     - name: Compile Java
-      run: javac ProduccionAeronaves.java
+      run: javac ProduccionAeronaves.java Aeronave.java Asiento.java Fabricante.java Modelo.java ModeloFactory.java Motor.java
 
     - name: Run ProduccionAeronaves
       run: java ProduccionAeronaves
