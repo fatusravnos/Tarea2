@@ -23,8 +23,17 @@ jobs:
     - name: Clean previous builds
       run: find . -name "*.class" -type f -delete
       
-    - name: Compile Java
-      run: javac ProduccionAeronaves.java Aeronave.java Asiento.java Fabricante.java Modelo.java ModeloFactory.Java Motor.java
+    - name: Compile all Java files
+      run: javac *.java
+      
+    - name: Verify compilation
+      run: |
+        if ls *.class 1> /dev/null 2>&1; then
+          echo "Compilation successful"
+        else
+          echo "No .class files found - compilation may have failed"
+          exit 1
+        fi
 
     - name: Run ProduccionAeronaves
       run: java ProduccionAeronaves
