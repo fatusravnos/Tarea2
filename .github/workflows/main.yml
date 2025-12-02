@@ -20,11 +20,20 @@ jobs:
         distribution: 'temurin'
         java-version: '11'
         
+    - name: List files (debug)
+      run: ls -la
+      
+    - name: List Java files (debug)
+      run: find . -name "*.java" -type f
+      
     - name: Clean previous builds
       run: find . -name "*.class" -type f -delete
       
     - name: Compile Java
       run: javac ProduccionAeronaves.java
-
+      
+    - name: Verify compilation
+      run: ls -la *.class
+      
     - name: Run ProduccionAeronaves
       run: java ProduccionAeronaves
