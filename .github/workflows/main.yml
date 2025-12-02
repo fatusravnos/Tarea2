@@ -2,16 +2,15 @@ name: Java CI
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
   pull_request:
-    branches: ["main"]
+    branches: [ "main" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-
     - name: Checkout repository
       uses: actions/checkout@v3
 
@@ -20,12 +19,12 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '11'
-
+        
     - name: Clean previous builds
       run: find . -name "*.class" -type f -delete
+      
+    - name: Compile Java
+      run: javac ProduccionAeronaves.java Aeronave.java Asiento.java Fabricante.java Modelo.java ModeloFactory.Java Motor.java
 
-    - name: Compile all Java files
-      run: javac $(find . -name "*.java") -d out
-
-    - name: Run main class
-      run: java -cp out ProduccionAeronaves
+    - name: Run ProduccionAeronaves
+      run: java ProduccionAeronaves
