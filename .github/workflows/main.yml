@@ -20,20 +20,54 @@ jobs:
         distribution: 'temurin'
         java-version: '11'
         
-    - name: List files (debug)
-      run: ls -la
-      
-    - name: List Java files (debug)
-      run: find . -name "*.java" -type f
-      
+    - name: Debug - Show repository structure
+      run: |
+        echo "📁 ESTRUCTURA DEL PROYECTO:"
+        echo "=========================="
+        find . -type f -name "*.java" | sort
+        echo ""
+        echo "📄 CONTENIDO DE CADA ARCHIVO:"
+        echo "============================="
+        for file in *.java; do
+          echo "➤ $file:"
+          head -20 "$file"
+          echo "---"
+        done
+        
     - name: Clean previous builds
       run: find . -name "*.class" -type f -delete
       
-    - name: Compile Java
-      run: javac ProduccionAeronaves.java
-      
-    - name: Verify compilation
-      run: ls -la *.class
-      
+    - name: Compile all Java files
+      run: |
+        echo "🔨 COMPILANDO PROYECTO..."
+        javac *.java
+        if [ $? -eq 0 ]; then
+          echo "✅ Compilación exitosa"
+        else
+          echo "❌ Error en compilación"
+          exit 1
+        fi
+        
+    - name: Show compiled classes
+      run: |
+        echo "📦 ARCHIVOS .class GENERADOS:"
+        echo "============================="
+        ls -la *.class
+        echo ""
+        echo "🗂️ Lista completa:"
+        find . -name "*.class" -type f
+        
     - name: Run ProduccionAeronaves
-      run: java ProduccionAeronaves
+      run: |
+        echo "🚀 EJECUTANDO PROGRAMA PRINCIPAL"
+        echo "================================="
+        java ProduccionAeronaves
+        EXIT_CODE=$?
+        echo ""
+        echo "📊 Programa finalizado con código: $EXIT_CODE"
+        if [ $EXIT_CODE -eq 0 ]; then
+          echo "✅ Ejecución completada con éxito"
+        else
+          echo "❌ Ocurrió un error durante la ejecución"
+          exit $EXIT_CODE
+        fi
