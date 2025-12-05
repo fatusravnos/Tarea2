@@ -20,11 +20,23 @@ jobs:
         distribution: 'temurin'
         java-version: '11'
 
-    - name: Clean previous builds
-      run: rm -rf out 2>/dev/null || true
+    - name: Verify Java files exist
+      run: |
+        echo "Java files found:"
+        find . -name "*.java" | grep -v ".git" || echo "No Java files found!"
 
-    - name: Compile all Java files
-      run: javac -d out $(find . -name "*.java")
+    - name: Clean previous builds
+      run: |
+        rm -rf out 2>/dev/null || true
+        rm -f *.class 2>/dev/null || true
+
+    - name: Compile Java files
+      run: |
+        mkdir -p out
+        javac -d out $(find . -name "*.java" -not -path "./.git/*")
+
+    - name: List compiled classes
+      run: find out -name "*.class" | head -20
 
     - name: Run main class
       run: java -cp out tarea2.ProduccionAeronaves
