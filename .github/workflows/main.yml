@@ -21,10 +21,10 @@ jobs:
         java-version: '11'
 
     - name: Clean previous builds
-      run: find . -name "*.class" -type f -delete
+      run: rm -rf out 2>/dev/null || true
 
     - name: Compile all Java files
-      run: javac $(find . -name "*.java") -d out
+      run: javac -d out $(find . -name "*.java")
 
     - name: Run main class
-      run: java -cp out ProduccionAeronaves
+      run: java -cp out tarea2.ProduccionAeronaves
