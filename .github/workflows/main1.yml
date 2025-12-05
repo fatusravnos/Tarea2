@@ -20,50 +20,47 @@ jobs:
         distribution: 'temurin'
         java-version: '11'
 
-    - name: Debug - Show project structure
-      run: |
-        echo "=== Project structure ==="
-        find . -name "*.java" -type f | sort
-        echo ""
-        echo "=== First few lines of main file ==="
-        head -5 ProduccionAeronaves.java || echo "File not found"
-
-    - name: Clean build directory
+    - name: Clean and prepare
       run: |
         rm -rf out 2>/dev/null || true
         mkdir -p out
 
-    - name: Compile with explicit path
+    - name: Analyze Java files
       run: |
-        echo "=== Compiling Java files ==="
-        # Compila todos los archivos Java en el directorio actual
-        javac -d out *.java 2>&1 | tee compile.log
-        echo "Compilation exit code: $?"
+        echo "=== Analyzing Java files ==="
+        for file in *.java; do
+          if [ -f "$file" ]; then
+            echo "File: $file"
+            grep -n "package\|class\|public class" "$file" | head -5
+          fi
+        done
 
-    - name: Debug compiled structure
+    - name: Compile with package handling
       run: |
-        echo "=== Compiled classes structure ==="
-        if [ -d "out" ]; then
-          find out -type f -name "*.class" | sort
-          echo ""
-          echo "=== Package structure ==="
-          ls -la out/ || echo "out directory exists but empty"
+        # Verifica si hay declaraciones de paquete
+        if grep -q "package tarea2" *.java 2>/dev/null; then
+          echo "Compiling with package tarea2"
+          javac -d out *.java
+          echo "Checking compiled structure..."
+          find out -name "*.class" | head -10
         else
-          echo "out directory not found"
+          echo "No package declarations found, compiling normally"
+          javac -d out *.java
         fi
 
-    - name: Check compilation log
-      if: always()
+    - name: Run the application
       run: |
-        echo "=== Compilation log ==="
-        cat compile.log 2>/dev/null || echo "No compilation log"
-
-    - name: Run main class (primer intento)
-      run: |
-        echo "=== Attempt 1: With package ==="
-        java -cp out tarea2.ProduccionAeronaves 2>&1 || echo "Attempt 1 failed"
-
-    - name: Run main class (segundo intento - sin paquete)
-      run: |
-        echo "=== Attempt 2: Without package (if no package declaration) ==="
-        java -cp out ProduccionAeronaves 2>&1 || echo "Attempt 2 failed"
+        echo "=== Running application ==="
+        # Intenta diferentes formas de ejecutar
+        if [ -f "out/tarea2/ProduccionAeronaves.class" ]; then
+          echo "Running with package: tarea2.ProduccionAeronaves"
+          java -cp out tarea2.ProduccionAeronaves
+        elif [ -f "out/ProduccionAeronaves.class" ]; then
+          echo "Running without package: ProduccionAeronaves"
+          java -cp out ProduccionAeronaves
+        else
+          echo "ERROR: Main class not found!"
+          echo "Available classes:"
+          find out -name "*.class" 2>/dev/null || echo "No classes found"
+          exit 1
+        fi
