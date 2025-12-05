@@ -2,9 +2,9 @@ name: Java CI
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
   pull_request:
-    branches: ["main"]
+    branches: [ "main" ]
 
 jobs:
   build:
@@ -19,48 +19,12 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '11'
+        
+    - name: Clean previous builds
+      run: find . -name "*.class" -type f -delete
+      
+    - name: Compile Java
+      run: javac ProduccionAeronaves.java
 
-    - name: Clean and prepare
-      run: |
-        rm -rf out 2>/dev/null || true
-        mkdir -p out
-
-    - name: Analyze Java files
-      run: |
-        echo "=== Analyzing Java files ==="
-        for file in *.java; do
-          if [ -f "$file" ]; then
-            echo "File: $file"
-            grep -n "package\|class\|public class" "$file" | head -5
-          fi
-        done
-
-    - name: Compile with package handling
-      run: |
-        # Verifica si hay declaraciones de paquete
-        if grep -q "package tarea2" *.java 2>/dev/null; then
-          echo "Compiling with package tarea2"
-          javac -d out *.java
-          echo "Checking compiled structure..."
-          find out -name "*.class" | head -10
-        else
-          echo "No package declarations found, compiling normally"
-          javac -d out *.java
-        fi
-
-    - name: Run the application
-      run: |
-        echo "=== Running application ==="
-        # Intenta diferentes formas de ejecutar
-        if [ -f "out/tarea2/ProduccionAeronaves.class" ]; then
-          echo "Running with package: tarea2.ProduccionAeronaves"
-          java -cp out tarea2.ProduccionAeronaves
-        elif [ -f "out/ProduccionAeronaves.class" ]; then
-          echo "Running without package: ProduccionAeronaves"
-          java -cp out ProduccionAeronaves
-        else
-          echo "ERROR: Main class not found!"
-          echo "Available classes:"
-          find out -name "*.class" 2>/dev/null || echo "No classes found"
-          exit 1
-        fi
+    - name: Run ProduccionAeronaves
+      run: java ProduccionAeronaves
